@@ -8,12 +8,12 @@ const urlDatabase = {
 };
 
 app.get('/',(req, res)=>{
- res.send('Hello!');
+ res.send('<html><body>Hello! <b> World</body><html>\n');
 });
 
 app.get('/urls.json',(req,res)=>{
   res.json(urlDatabase);
-})
+});
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
