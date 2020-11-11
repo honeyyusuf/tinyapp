@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = 8080;
 
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(cookieParser());
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -28,7 +30,10 @@ app.get('/urls/new',(req,res)=>{
 
 });
 app.get('/urls',(req,res)=>{
-  const templateVars = {urls:urlDatabase};
+  let username = req.cookies["username"]
+  const templateVars = {urls:urlDatabase,
+    username:username };
+    console.log(templateVars);
   res.render('urls_index',templateVars);
 });
 
@@ -42,6 +47,7 @@ app.post('/urls/',(req,res) =>{
 ///////////////Delete/////////////
 app.post('/urls/:shortURL/delete',(req,res)=>{
   delete urlDatabase[req.params.shortURL];
+  
   res.redirect('/urls');
 });
 //////////////Edit/////////////
@@ -59,6 +65,23 @@ app.get('/u/:shortURL',(req,res)=>{
   let longURL = urlDatabase[req.params.shortURL];
   //console.log(longURL);
   res.redirect(longURL);
+});
+//////////////LogIn///////////////
+app.post('/login',(req,res)=>{
+  //res.cookie('username',req.body.username);
+  let username = req.body.username;
+  console.log(username);
+  res.cookie('username',username);
+ 
+ 
+  res.redirect('/urls');
+});
+
+////////////////LogOut//////////////////
+
+app.post('/logout',(req,res)=>{
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
