@@ -9,8 +9,9 @@ app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL:"http://www.lighthouselabs.ca" , id:"id1" } ,
+
+  "9sm5xK": {longURL:"http://www.google.com" ,id:"id2"}
 };
 const users = { "id1":{
   id : "id1",
@@ -45,12 +46,17 @@ app.get('/urls',(req,res)=>{
   //console.log(templateVars);
   res.render('urls_index',templateVars);
 });
-
+///////////creating short urls/////////
 app.post('/urls/',(req,res) =>{
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  //console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`);
+  let user = req.cookies.user;
+  if (user) {
+    urlDatabase[shortURL] = {longURL: req.body.longURL, id:user.id};
+    //console.log(urlDatabase);
+    return res.redirect(`/urls/${shortURL}`);
+  }
+    
+  res.redirect('/login');
   
 });
 ///////////////Delete/////////////
@@ -67,12 +73,21 @@ app.post('/urls/:shortURL',(req,res)=>{
   res.redirect('/urls');
 });
 app.get('/urls/:shortURL',(req,res)=>{
-  const templateVars = {shortURL: req.params.shortURL,longURL:urlDatabase[req.params.shortURL]};
+  let user = req.cookies.user;
+  //console.log(user);
+  
+   
+  const templateVars = {shortURL: req.params.shortURL,longURL:urlDatabase[req.params.shortURL].longURL,user};
   res.render('urls_show',templateVars);
+    
+  
+  
+  
 });
 ///////////Redirect to long urls//////////
 app.get('/u/:shortURL',(req,res)=>{
-  let longURL = urlDatabase[req.params.shortURL];
+  console.log(req.params);
+  let longURL = urlDatabase[req.params.shortURL].longURL;
   
   res.redirect(longURL);
 });
@@ -89,6 +104,7 @@ app.post('/login',(req,res)=>{
   
   
 });
+
 app.get('/login',(req,res)=>{
   
   let templateVars = {user:null};
@@ -115,7 +131,7 @@ app.post('/register', (req,res)=>{
   
   let checkemail = checkmail(users,email,password);
   if (checkemail) {
-    res.send('400');
+    res.send('404');
   } else {
     users[id] = {
       id,
