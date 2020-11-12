@@ -26,19 +26,16 @@ const usercheck = (objs, email, password) => {
     return {error:'email', obj:null};
   }
 };
-const checkmail = (objs, email, password) => {
-  if (email === '' || password === '') {
-    return {error : "Please input the email and password"};
-  } else {
-    for (let obj in objs) {
-      if (email === objs[obj].email) {
-        return {error:"email already exists",obj:null };
-      }
-      
+const getUserByEmail = (email,users) => {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return user;
     }
   }
-
+  return null;
 };
+
+
 const urlsForUser = (objs,id) => {
   let userURL = {};
   for (let obj in objs) {
@@ -51,4 +48,4 @@ const urlsForUser = (objs,id) => {
 
 
 
-module.exports = {generateRandomString, checkmail , usercheck ,urlsForUser};
+module.exports = {generateRandomString, getUserByEmail, usercheck ,urlsForUser};
