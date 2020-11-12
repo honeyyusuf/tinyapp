@@ -2,26 +2,31 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const {generateRandomString , checkmail, usercheck , urlsForUser} = require('./helperfunction');
+const bcrypt = require('bcryptjs');
+const index = bcrypt.genSaltSync(10); // the lentgh the scabbme password
 const app = express();
 const PORT = 8080;
 
 app.set("view engine","ejs");
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
+
 const urlDatabase = {
   "b2xVn2": {longURL:"http://www.lighthouselabs.ca" , id:"id1" } ,
 
   "9sm5xK": {longURL:"http://www.google.com" ,id:"id2"}
 };
+let hashPw1 = bcrypt.hashSync("1234", index);
+let hashPw2 = bcrypt.hashSync("0000", index);
 const users = { "id1":{
   id : "id1",
   email:"name1@email.com",
-  password:"1234"
+  password:hashPw1
 },
 "id2":{
   id : "id2",
   email:"name2@email.com",
-  password:"0000"
+  password:hashPw2
 }
 };
 
@@ -146,13 +151,13 @@ app.post('/logout',(req,res)=>{
 ///////////register rendering page//////////
 app.get('/register', (req,res) =>{
   //let user = req.cookies;
-  let templateVars = {user:null};
+  let templateVars = {user:users[req.cookies['userID']]};
   res.render('urls_user', templateVars);
 });
 /////////posting register user///////
 app.post('/register', (req,res)=>{
   let email = req.body.email;
-  let password = req.body.password;
+  let password = bcrypt.hashSync(req.body.password,index);
   let id = generateRandomString();
   
   let checkemail = checkmail(users,email,password);
