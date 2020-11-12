@@ -34,8 +34,18 @@ const checkmail = (objs, email, password) => {
       
     }
   }
+
+};
+const urlsForUser = (objs,id) => {
+  let userURL = {};
+  for (let obj in objs) {
+    if (objs[obj].id === id) {
+      userURL[obj] = objs[obj];
+    }
+  }
+  return userURL;
 };
 
 
 
-module.exports = {generateRandomString, checkmail , usercheck};
+module.exports = {generateRandomString, checkmail , usercheck ,urlsForUser};
