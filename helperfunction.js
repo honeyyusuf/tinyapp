@@ -1,6 +1,9 @@
 
 
 
+const bcrypt = require('bcryptjs');
+
+
 function generateRandomString() {
   let shorran = Math.random().toString(36).substring(2, 8);
   return shorran;
@@ -12,7 +15,7 @@ const usercheck = (objs, email, password) => {
   } else {
     for (let obj in objs) {
       if (objs[obj].email === email) {
-        if (objs[obj].password === password) {
+        if (bcrypt.compareSync(password,objs[obj].password)) {
           return {error:null , obj};
         } else {
           return {error:'password', obj:null};
